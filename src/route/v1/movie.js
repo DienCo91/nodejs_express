@@ -20,14 +20,12 @@ application to handle JSON data in the request body easily. */
 router.use(express.json());
 
 router.use(logger);
-// middleware lấy giá trị id khi truyền đường dẫn chứa id làm param, kiểm tra id xem có tồn tại hay không
-router.param("id", checkId);
 
 router.get("/", getAllMovies);
 router.post("/", validateBody, postMovie);
-router.get("/:id(\\d+)?", getMovieById);
-router.patch("/:id(\\d+)", patchMovieById);
+router.get("/:id", getMovieById);
+router.patch("/:id", patchMovieById);
 router.use(logger2);
-router.delete("/:id(\\d+)", deleteMovieById);
+router.delete("/:id", deleteMovieById);
 
 module.exports = router;

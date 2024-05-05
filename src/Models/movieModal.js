@@ -27,6 +27,7 @@ const moviesSchema = new mongoose.Schema({
   createAt: {
     type: Date,
     default: Date.now(),
+    select: false, // không select ( sử dụng trong trường hợp trường là private ví dụ như mật khẩu của người dùng )
   },
   genres: {
     type: [String],

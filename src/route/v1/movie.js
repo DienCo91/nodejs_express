@@ -9,6 +9,7 @@ const {
   checkId,
   validateBody,
   logger,
+  getHighRatings,
 } = require("../../Controller/moviesController");
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.use(express.json());
 
 router.use(logger);
 
+router.get("/high-ratings", getHighRatings, getAllMovies);
 router.get("/", getAllMovies);
 router.post("/", validateBody, postMovie);
 router.get("/:id", getMovieById);

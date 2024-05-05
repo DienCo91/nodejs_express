@@ -16,7 +16,11 @@ exports.logger2 = (req, res, next) => {
 exports.validateBody = (req, res, next) => {
   next();
 };
-
+exports.getHighRatings = (req, res, next) => {
+  req.query.limit = "5";
+  req.query.sort = "-ratings";
+  next();
+};
 exports.getAllMovies = async (req, res) => {
   try {
     // const movies = await Movie.find({
@@ -44,16 +48,49 @@ exports.getAllMovies = async (req, res) => {
     if (req.query.sort) {
       delete filter.sort;
     }
+    if (req.query.field) {
+      delete filter.field;
+    }
+    if (req.query.page) {
+      delete filter.page;
+    }
+    if (req.query.limit) {
+      delete filter.limit;
+    }
     let query = Movie.find(filter);
 
     //sort
     //http://localhost:8000/movie/v1/?sort=-price,ratings
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" "); // 'price,ratings'
+      const sortBy = req.query.sort.split(",").join(" "); // 'price ratings'
       query = query.sort(sortBy);
     } else {
       query = query.sort("-createAt");
     }
+
+    //field
+    //http://localhost:8000/movie/v1/?field=ratings,price,_id
+    if (req.query.field) {
+      field = req.query.field.split(",").join(" "); // 'ratings price _id'
+      query = query.select(field);
+    } else {
+      query = query.select("-__v");
+    }
+    // phân trang
+    //http://localhost:8000/movie/v1/?page=5&limit=2
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 4;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+    if (req.query.page) {
+      const totalDocument = await Movie.countDocuments();
+      console.log(skip, totalDocument);
+      if (skip >= totalDocument) {
+        throw new Error("Not found page");
+      }
+    }
+
     const movies = await query;
 
     res.status(200).json({

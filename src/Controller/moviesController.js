@@ -2,6 +2,7 @@ const express = require("express");
 
 const path = require("path");
 const Movie = require("../Models/movieModal");
+const ApiFeatures = require("../Utils/ApiFeatures");
 
 exports.logger = (req, res, next) => {
   console.log("Middleware called 1");
@@ -23,75 +24,14 @@ exports.getHighRatings = (req, res, next) => {
 };
 exports.getAllMovies = async (req, res) => {
   try {
-    // const movies = await Movie.find({
-    //   $and: [
-    //     { ratings: { $lt: 3 } },
-    //     { $expr: { $gt: [{ $strLenCP: "$name" }, 4] } },
-    //   ],
-    // });
-    // const { duration, ratings } = req.query;
-    // const movies = await Movie.find()
-    //   .where("duration")
-    //   .gte(duration)
-    //   .where("ratings")
-    //   .lte(ratings);
+    const totalDocument = await Movie.countDocuments();
+    const feature = new ApiFeatures(Movie.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate(totalDocument);
 
-    // need use query
-    // http://localhost:8000/movie/v1?ratings[gt]=1&&price[gt]=9.99&&duration=169
-
-    let filter = JSON.stringify(req.query).replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`
-    );
-    filter = JSON.parse(filter);
-    console.log(filter);
-    if (req.query.sort) {
-      delete filter.sort;
-    }
-    if (req.query.field) {
-      delete filter.field;
-    }
-    if (req.query.page) {
-      delete filter.page;
-    }
-    if (req.query.limit) {
-      delete filter.limit;
-    }
-    let query = Movie.find(filter);
-
-    //sort
-    //http://localhost:8000/movie/v1/?sort=-price,ratings
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" "); // 'price ratings'
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort("-createAt");
-    }
-
-    //field
-    //http://localhost:8000/movie/v1/?field=ratings,price,_id
-    if (req.query.field) {
-      field = req.query.field.split(",").join(" "); // 'ratings price _id'
-      query = query.select(field);
-    } else {
-      query = query.select("-__v");
-    }
-    // phân trang
-    //http://localhost:8000/movie/v1/?page=5&limit=2
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 4;
-    const skip = (page - 1) * limit;
-
-    query = query.skip(skip).limit(limit);
-    if (req.query.page) {
-      const totalDocument = await Movie.countDocuments();
-      console.log(skip, totalDocument);
-      if (skip >= totalDocument) {
-        throw new Error("Not found page");
-      }
-    }
-
-    const movies = await query;
+    const movies = await feature.query;
 
     res.status(200).json({
       status: "OK",
@@ -161,6 +101,35 @@ exports.deleteMovieById = async (req, res) => {
     res.status(204).json({
       status: "OK",
       data: movieDeleted,
+    });
+  } catch (err) {
+    res.status(400).json({ status: "Bad Request", message: err.message });
+  }
+};
+
+exports.getMovieStats = async (req, res) => {
+  try {
+    const stats = await Movie.aggregate([
+      { $match: { ratings: { $gt: 8, $lt: 20 } } },
+      {
+        $group: {
+          _id: "$duration", // group theo nam
+          maxRatings: { $max: "$ratings" },
+          avgRatings: { $avg: "$ratings" },
+          maxPrice: { $max: "$price" },
+          minPrice: { $min: "$price" },
+          avgPrice: { $avg: "$price" },
+          totalPrice: { $sum: "$price" },
+          movieCount: { $sum: 1 },
+        }, // cho vào 1 nhóm với điều kiện cụ thể thông qua ID và lấy được thông số của từng nhóm
+      },
+      { $sort: { avgPrice: 1 } }, //sort các nhóm
+      { $match: { maxPrice: { $gt: 13 } } },
+    ]);
+
+    res.status(200).json({
+      status: "OK",
+      data: stats,
     });
   } catch (err) {
     res.status(400).json({ status: "Bad Request", message: err.message });

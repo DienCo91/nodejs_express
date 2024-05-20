@@ -30,6 +30,7 @@ exports.getAllMovies = async (req, res) => {
       .sort()
       .limitFields()
       .paginate(totalDocument);
+    console.log(123);
 
     const movies = await feature.query;
 

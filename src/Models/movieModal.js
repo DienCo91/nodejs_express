@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const validator = require("validator");
 const moviesSchema = new mongoose.Schema(
   {
     name: {
@@ -7,14 +7,34 @@ const moviesSchema = new mongoose.Schema(
       required: [true, "Name is required"],
       unique: true,
       trim: true,
+      maxlength: [100, "Movies name must not exceed 100 characters"],
+      minlength: [4, "Movies must have at least 4 characters"],
+      unique: true,
+      validate: {
+        validator: (value) => {
+          return validator.isAlpha(value);
+        },
+        message: "{VALUE} is not a valid alphabets character",
+      },
     },
     description: { type: String, default: null, trim: true },
     duration: {
       type: Number,
       required: [true, "Duration is required"],
       trim: true,
+      min: [30, "Movies must have at least 30 minutes"],
     },
-    ratings: { type: Number, default: 1.0, trim: true },
+    ratings: {
+      type: Number,
+      default: 1.0,
+      trim: true,
+      validate: {
+        validator: (value) => {
+          return value >= 0 && value <= 10;
+        },
+        message: `'{VALUE}' invalid rating above 1 and below 10`,
+      },
+    },
     totalRating: {
       type: Number,
     },
@@ -54,6 +74,22 @@ const moviesSchema = new mongoose.Schema(
       type: String,
       // required: [true, "CreateBy is required"],
     },
+    drink: {
+      type: String,
+      enum: {
+        values: ["Coffee", "Tea"],
+        message: "This drink not existing",
+      },
+    },
+    email: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v);
+        },
+        message: (props) => `${props.value} is not a valid email!`,
+      },
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -72,13 +108,14 @@ moviesSchema.pre("save", function (next) {
   this.createBy = "Admin";
   next();
 });
-// Executed before the document is saved in db
+// Executed before the document is find in db
 //start .find() is working
 moviesSchema.pre(/^find/, function (next) {
   this.find({ duration: { $lte: 142 } });
   this.startTime = Date.now();
   next();
 });
+// Executed before the document is find in db
 moviesSchema.post(/^find/, function (docs, next) {
   console.log(`${Date.now() - this.startTime}`);
   next();

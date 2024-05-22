@@ -84,7 +84,7 @@ exports.patchMovieById = async (req, res) => {
     // ); // thay doi cac truong co trong req.body
     const movie = await Movie.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true,
+      runValidators: true, // sử dụng để validate dữ liệu khi cập nhật data ( trả ra thông báo sai khi không thỏa mãn điều kiện của trường )
     });
     // {new: true} tra ve data sau khi lam moi
     res.status(200).json({

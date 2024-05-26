@@ -9,6 +9,9 @@ const express = require("express");
 
 const morgan = require("morgan");
 const cors = require("cors");
+const CustomError = require("./Utils/CustomError");
+
+const handleErrorGlobal = require("./Controller/errorController");
 const app = express();
 app.use(cors());
 
@@ -117,4 +120,11 @@ app
     res.send("Hello from post");
   });
 
+app.all("*", (req, res, next) => {
+  const err = new CustomError(`Not Found ${req.originalUrl} Router`, 404);
+  next(err || 2); // neu truyen doi so vao day Express se hieu la co 1 loi
+});
+
+// neu co loi se truc tiep vao ham nay ma bo qua cac middleware khac (thuong de o cuoi cua middleware)
+app.use(handleErrorGlobal);
 module.exports = app;

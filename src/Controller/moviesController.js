@@ -1,6 +1,3 @@
-const express = require("express");
-
-const path = require("path");
 const Movie = require("../Models/movieModal");
 const ApiFeatures = require("../Utils/ApiFeatures");
 const CustomError = require("../Utils/CustomError");
@@ -46,13 +43,18 @@ exports.postMovie = asyncErrorHandler(async (req, res, next) => {
   // const movieItem = new Movie({});
   // movieItem.save().then(() => {});
 
-  const movie = await Movie.create(req.body);
-  res.status(200).json({
-    status: "OK",
-    data: {
-      movie: movie,
-    },
-  });
+  try {
+    const movie = await Movie.create(req.body);
+    res.status(200).json({
+      status: "OK",
+      data: {
+        movie: movie,
+      },
+    });
+  } catch (err) {
+    const newErr = new CustomError(err.message, 400);
+    next(newErr);
+  }
 });
 exports.getMovieById = asyncErrorHandler(async (req, res, next) => {
   try {
@@ -67,6 +69,7 @@ exports.getMovieById = asyncErrorHandler(async (req, res, next) => {
     });
   } catch (err) {
     const error = new CustomError("Movie not found", 404);
+    console.log(error.isOperation);
     next(error);
   }
 });

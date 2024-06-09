@@ -5,6 +5,7 @@ const animal = require("./route/animal");
 const datetime = require("./route/middleware");
 const handleError = require("./route/handleError");
 const movie = require("./route/v1/movie");
+const user = require("./route/v1/user");
 const express = require("express");
 
 const morgan = require("morgan");
@@ -13,12 +14,18 @@ const CustomError = require("./Utils/CustomError");
 
 const handleErrorGlobal = require("./Controller/errorController");
 const app = express();
+/* `router.use(express.json());` is setting up middleware in the Express router to parse incoming
+requests with JSON payloads. This middleware function parses incoming request bodies and makes the
+parsed JSON data available on the `req.body` property of the request object. This allows the
+application to handle JSON data in the request body easily. */
+app.use(express.json());
 app.use(cors());
 
 app.use("/animal", animal);
 app.use("/datetime", datetime);
 app.use("/error", handleError);
 app.use("/movie/v1", movie);
+app.use("/user/v1", user);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));

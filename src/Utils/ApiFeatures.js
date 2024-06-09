@@ -5,10 +5,12 @@ class ApiFeatures {
   }
   filter() {
     // http://localhost:8000/movie/v1?ratings[gt]=1&&price[gt]=9.99&&duration=169
+    console.log(this.queryString);
     let filter = JSON.stringify(this.queryString).replace(
       /\b(gte|gt|lte|lt)\b/g,
       (match) => `$${match}`
     );
+    console.log(filter);
     filter = JSON.parse(filter);
 
     if (this.queryString.sort) {

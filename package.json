@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "nodemon --inspect src/server.js"
+    "dev": "nodemon --inspect src/server.js",
+    "prod": "SET NODE_ENV=production & nodemon --inspect src/server.js"
   },
   "author": "",
   "license": "ISC",

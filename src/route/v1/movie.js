@@ -13,19 +13,19 @@ const {
   getMovieStats,
   getMovieByGenres,
 } = require("../../Controller/moviesController");
+const { protectRouter } = require("../../Controller/authController");
 
 const router = express.Router();
 
-router.use(logger);
+router.use(protectRouter);
 
-router.get("/high-ratings", getHighRatings, getAllMovies);
+router.get("/high-ratings", [getHighRatings, protectRouter], getAllMovies);
 router.get("/movie-stats", getMovieStats);
 router.get("/movies-by-genre", getMovieByGenres);
 router.get("/", getAllMovies);
 router.post("/", validateBody, postMovie);
 router.get("/:id", getMovieById);
 router.patch("/:id", patchMovieById);
-router.use(logger2);
 router.delete("/:id", deleteMovieById);
 
 module.exports = router;

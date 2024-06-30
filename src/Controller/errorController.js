@@ -21,9 +21,19 @@ const prodError = (error, res) => {
   }
 };
 
+const expiredToken = (err, res) => {
+  res.status(401).json({
+    status: "401",
+    message: "expired token",
+  });
+};
+
 const handleErrorGlobal = (error, req, res, next) => {
   if (process.env.NODE_ENV === "development") {
     console.log("Error Global development");
+    if (error.message === "jwt expired") {
+      expiredToken(error, res);
+    }
     devError(error, res);
   } else {
     console.log("Error Global production");

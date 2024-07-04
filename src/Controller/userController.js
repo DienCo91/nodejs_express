@@ -34,7 +34,6 @@ exports.signUp = async (req, res) => {
 };
 
 exports.signIn = asyncErrorHandler(async (req, res, next) => {
-  console.log(req.body);
   try {
     const user = await User.findOne({ name: req.body.name }).select(
       "+password"
@@ -59,6 +58,22 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
         token: token,
       });
     }
+  } catch (err) {
+    const error = new CustomError("Not Found", 404);
+    next(error);
+  }
+});
+
+exports.updateUser = asyncErrorHandler(async (req, res, next) => {
+  console.log(req.body);
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.status(200).json({
+      status: "Success",
+      data: user,
+    });
   } catch (err) {
     const error = new CustomError("Not Found", 404);
     next(error);

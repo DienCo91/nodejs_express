@@ -8,7 +8,7 @@ exports.protectRouter = asyncErrorHandler(async (req, res, next) => {
   const tokenTest = req.headers["authorization"];
   let token;
 
-  if (tokenTest && tokenTest.startsWith("bearer")) {
+  if (tokenTest && tokenTest.startsWith("Bearer")) {
     token = tokenTest.split(/\s+/)[1];
   }
   if (!token) {
@@ -34,6 +34,19 @@ exports.protectRouter = asyncErrorHandler(async (req, res, next) => {
   //4 if user changed password after the token was issued
 
   //5 allow user to access routes
-  res.user = user;
+  req.user = user;
+
   next();
 });
+
+exports.restrict = (role) => {
+  return (req, res, next) => {
+    console.log(req.user);
+    if (req.user.role === role) {
+      next();
+    } else {
+      const error = new CustomError("You do n not have permission", 403);
+      next(error);
+    }
+  };
+};

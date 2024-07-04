@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
       message: "{VALUE} is not a valid Email",
     },
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
   password: {
     type: String,
     required: [true, "Password is required"],
@@ -46,6 +51,7 @@ const userSchema = new mongoose.Schema({
 // userSchema.path("confirmPassword").validate(function (value) {
 //   return this.password === value;
 // }, "Password confirmation does not match password");
+// xu li ma hoa mk kh save db
 userSchema.pre("save", async function (next) {
   // neu password thay doi thi ma hoa tiep neu khong thi save vao db
   if (!this.isModified("password")) {
@@ -62,6 +68,5 @@ userSchema.methods.comparePasswordInDB = async function (password, passwordDB) {
 };
 
 const User = mongoose.model("User", userSchema);
-// xu li ma hoa mk kh save db
 
 module.exports = User;

@@ -39,7 +39,6 @@ router.get("/:id(\\d+)", (req, res, next) => {
 
 router.use("/error/error", (err, req, res, next) => {
   // neu them err vào agr thì hàm sẽ chạy khi có lỗi còn ko có lỗi sẽ thực hiện luôn mà ko thông qua use
-  console.log(new Date());
   next();
   res.send("Something broke!");
 });

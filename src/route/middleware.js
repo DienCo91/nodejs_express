@@ -11,7 +11,6 @@ const dateTime = (req, res, next) => {
 router.use(dateTime);
 
 router.get("/", (req, res) => {
-  console.log("req", req);
   res.send(req.name);
 });
 

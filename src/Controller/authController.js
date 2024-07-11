@@ -41,7 +41,6 @@ exports.protectRouter = asyncErrorHandler(async (req, res, next) => {
 
 exports.restrict = (role) => {
   return (req, res, next) => {
-    console.log(req.user);
     if (req.user.role === role) {
       next();
     } else {

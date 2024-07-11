@@ -1,5 +1,9 @@
 const path = require("path");
 const rateLimit = require("express-rate-limit");
+const helmet = require("helmet")
+const sanitize= require('express-mongo-sanitize')
+const xss = require("xss-clean");
+const hpp = require("hpp")
 // route
 const animal = require("./route/animal");
 const datetime = require("./route/middleware");
@@ -15,7 +19,7 @@ const CustomError = require("./Utils/CustomError");
 const handleErrorGlobal = require("./Controller/errorController");
 const app = express();
 const limiter = rateLimit({
-  max: 3, // max 1000 request
+  max: 1000, // max 1000 request
   windowMs: 60 * 60 * 1000, // in 1h
   message: "You max request in 1 hour . You try after 1 hour",
 });
@@ -24,9 +28,24 @@ const limiter = rateLimit({
 requests with JSON payloads. This middleware function parses incoming request bodies and makes the
 parsed JSON data available on the `req.body` property of the request object. This allows the
 application to handle JSON data in the request body easily. */
-app.use(express.json());
+app.use(express.json({limit:'10kb'}));
+
+// middleware handle security issues
+app.use(sanitize())
+app.use(xss());
+app.use(helmet()); 
+
 app.use(cors());
+
+//handle parameters query string
+// neu default hpp() 
+//ex: {{URL}}/movie/v1?duration=120&duration=114 => loc theo duration=114 
+// neu  hpp({whiteList:['duration']}) =>loc theo duration=[120,114] 
+app.use(hpp({whitelist:['duration']}))
+
+//middleware handle limit requests
 app.use(limiter);
+
 app.use("/animal", animal);
 app.use("/datetime", datetime);
 app.use("/error", handleError);
@@ -36,7 +55,7 @@ app.use("/user/v1", user);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 
-app.use(express.json());
+
 
 app.post("/", (req, res) => {
   res.send("home");

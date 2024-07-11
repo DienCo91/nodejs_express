@@ -5,12 +5,11 @@ class ApiFeatures {
   }
   filter() {
     // http://localhost:8000/movie/v1?ratings[gt]=1&&price[gt]=9.99&&duration=169
-    console.log(this.queryString);
     let filter = JSON.stringify(this.queryString).replace(
       /\b(gte|gt|lte|lt)\b/g,
       (match) => `$${match}`
     );
-    console.log(filter);
+
     filter = JSON.parse(filter);
 
     if (this.queryString.sort) {
@@ -25,13 +24,15 @@ class ApiFeatures {
     if (this.queryString.limit) {
       delete filter.limit;
     }
-
+   
     this.query = this.query.find(filter);
+   
     return this;
   }
   sort() {
     // http://localhost:8000/movie/v1/?sort=-price,ratings
     if (this.queryString.sort) {
+      
       const sortBy = this.queryString.sort.split(",").join(" "); // 'price ratings'
       this.query = this.query.sort(sortBy);
     } else {
@@ -54,7 +55,7 @@ class ApiFeatures {
     const page = this.queryString.page * 1 || 1;
     const limit = this.queryString.limit * 1 || 4;
     const skip = (page - 1) * limit;
-    console.log(skip, limit);
+    
     this.query = this.query.skip(skip).limit(limit);
     if (totalDocument) {
       if (skip >= totalDocument) {

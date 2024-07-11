@@ -111,13 +111,12 @@ moviesSchema.pre("save", function (next) {
 // Executed before the document is find in db
 //start .find() is working
 moviesSchema.pre(/^find/, function (next) {
-  this.find({ duration: { $lte: 142 } });
+  // this.find({ duration: { $lte: 142 } });
   this.startTime = Date.now();
   next();
 });
 // Executed before the document is find in db
 moviesSchema.post(/^find/, function (docs, next) {
-  console.log(`${Date.now() - this.startTime}`);
   next();
 });
 

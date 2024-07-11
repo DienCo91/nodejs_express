@@ -23,6 +23,7 @@ exports.getHighRatings = (req, res, next) => {
 };
 exports.getAllMovies = asyncErrorHandler(async (req, res, next) => {
   const totalDocument = await Movie.countDocuments();
+ 
   const feature = new ApiFeatures(Movie.find(), req.query)
     .filter()
     .sort()
@@ -69,7 +70,6 @@ exports.getMovieById = asyncErrorHandler(async (req, res, next) => {
     });
   } catch (err) {
     const error = new CustomError("Movie not found", 404);
-    console.log(error.isOperation);
     next(error);
   }
 });

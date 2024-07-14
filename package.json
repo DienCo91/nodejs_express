@@ -1,11 +1,11 @@
 {
-  "name": "myapp",
+  "name": "08092003",
   "version": "1.0.0",
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "dev": "nodemon --inspect src/server.js",
-    "prod": "SET NODE_ENV=production & nodemon --inspect src/server.js"
+    "dev": "SET ENVFILE=.env.dev & nodemon --inspect src/server.js",
+    "prod": "SET ENVFILE=.env.prod & nodemon --inspect src/server.js"
   },
   "author": "",
   "license": "ISC",

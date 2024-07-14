@@ -61,7 +61,9 @@ app.use("/course/v1", course);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 
-
+app.get("/", (req, res) => {
+  res.send("Hello world!");
+});
 
 app.post("/", (req, res) => {
   res.send("home");

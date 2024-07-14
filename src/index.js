@@ -10,6 +10,9 @@ const datetime = require("./route/middleware");
 const handleError = require("./route/handleError");
 const movie = require("./route/v1/movie");
 const user = require("./route/v1/user");
+const profile = require("./route/v1/profile");
+const book = require("./route/v1/book");
+const course = require("./route/v1/course");
 const express = require("express");
 
 const morgan = require("morgan");
@@ -51,6 +54,9 @@ app.use("/datetime", datetime);
 app.use("/error", handleError);
 app.use("/movie/v1", movie);
 app.use("/user/v1", user);
+app.use("/profile/v1", profile);
+app.use("/book/v1", book);
+app.use("/course/v1", course);
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));

@@ -21,11 +21,21 @@ exports.getAllUser = asyncErrorHandler(async (req, res, next) => {
   });
 });
 
+exports.getUserById = asyncErrorHandler(async (req, res, next) => {
+  const user = await User.findOne({_id: req.params.id}).populate('profile').populate('books').populate('courses')
+  res.status(200).json({
+    status: "OK",
+    length: user.length,
+    data: user,
+  });
+});
+
 exports.signUp = async (req, res) => {
   try {
-    await User.create(req.body);
+   const user= await User.create(req.body);
     res.status(201).json({
       status: "Created",
+      user:user
     });
   } catch (err) {
     res.status(400).json({
@@ -39,7 +49,7 @@ exports.signIn = asyncErrorHandler(async (req, res, next) => {
   try {
     const user = await User.findOne({ name: req.body.name }).select(
       "+password"
-    );
+    ).populate('profile');
 
     if (!user) throw new Error();
     const isMatchPassword = await user.comparePasswordInDB(

@@ -26,7 +26,7 @@ exports.protectRouter = asyncErrorHandler(async (req, res, next) => {
   );
 
   //3 if user exists
-  const user = await User.findById(id);
+  const user = await User.findById(id).populate('profile');
   if (!user) {
     const error = new CustomError("User not found", 404);
     next(error);
@@ -35,7 +35,7 @@ exports.protectRouter = asyncErrorHandler(async (req, res, next) => {
 
   //5 allow user to access routes
   req.user = user;
-
+  
   next();
 });
 

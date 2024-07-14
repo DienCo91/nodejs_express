@@ -49,6 +49,16 @@ const userSchema = new mongoose.Schema({
   photo: { type: String },
   passwordResetToken: { type: String },
   passwordResetTokenExpires: { type: Date },
+  // one to one 
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ProfileUser",
+  },
+  // one to many
+  books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+  // many to many
+  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }]
+
 });
 
 // userSchema.path("confirmPassword").validate(function (value) {

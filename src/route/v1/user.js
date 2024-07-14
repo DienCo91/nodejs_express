@@ -7,12 +7,14 @@ const {
   passwordReset,
   forgotPassword,
   updatePassword,
+  getUserById,
 } = require("../../Controller/userController");
 const { protectRouter, restrict } = require("../../Controller/authController");
 
 const router = express.Router();
 
 router.get("/", protectRouter, restrict("admin"), getAllUser);
+router.get("/:id",protectRouter,getUserById)
 router.post("/signup", signUp);
 router.post("/login", signIn);
 router.put("/:id", protectRouter, restrict("admin"), updateUser);

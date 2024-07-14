@@ -17,7 +17,7 @@ const { protectRouter } = require("../../Controller/authController");
 
 const router = express.Router();
 
-router.use(protectRouter);
+// router.use(protectRouter);
 
 router.get("/high-ratings", [getHighRatings, protectRouter], getAllMovies);
 router.get("/movie-stats", getMovieStats);
